@@ -1,5 +1,5 @@
 from django.contrib import admin
-from models import Category, Product, ProductSize, \
+from .models import Category, Product, ProductSize, \
     ProductImage, Size
 
 class ProductImageInLine(admin.TabularInline):
