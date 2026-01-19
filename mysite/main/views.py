@@ -24,10 +24,10 @@ class CatalogView(TemplateView):
     template = 'main/base.html'
 
     FILTER_MAPPING = {
-        'color':lambda queryset, value: queryset.filter(color_iexact=value),
+        'color': lambda queryset, value: queryset.filter(color_iexact=value),
         'main_price': lambda queryset, value: queryset.filter(price_gte=value),
         'max_price': lambda queryset, value: queryset.filter(price_lte=value),
-        'size': lambda queryset, value: queryset.filter(product_size__size__name=value),
+        'size': lambda queryset, value: queryset.filter(product_sizes__size__name=value),
     }
 
     def get_context_data(self, **kwargs):
@@ -35,7 +35,7 @@ class CatalogView(TemplateView):
         category_slug = kwargs.get('category_slug')
         categories = Category.objects.all()
         products = Product.objects.all().order_by('-created_at')
-        current_category = None
+        current_categories = None
 
         if category_slug:
             current_category = get_object_or_404(Category, slug=category_slug)
@@ -44,7 +44,7 @@ class CatalogView(TemplateView):
         query = self.request.GET.get('q')
         if query:
             products = products.filter(
-                Q(name_icontains=query) | Q(description_icontains=query)
+                Q(name__icontains=query) | Q(description__icontains=query)
             )
 
         filter_params = {}
@@ -105,5 +105,5 @@ class ProductDetailView(DetailView):
         self.object = self.get_object()
         context = self.get_context_data(**kwargs)
         if request.headers.get('HX-Request'):
-            return TemplateResponse(request, 'main/product_detail.html')
+            return TemplateResponse(request, 'main/product_detail.html', context)
         raise TemplateResponse(request, self.template_name, context)
